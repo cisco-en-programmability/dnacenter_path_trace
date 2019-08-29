@@ -19,6 +19,7 @@ Path Trace is a excellent tool to assist in troubleshooting connectivity between
 This script will use the Cisco DNA Center APIs to find out the path taken in the network between the source and destination devices specified.
 
 mandatory parameters: source_ip and destination_ip
+
 optional parameters: source_port, destination_port, protocol
 
 Sample output:
