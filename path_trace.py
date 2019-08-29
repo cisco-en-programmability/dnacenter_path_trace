@@ -32,6 +32,7 @@ import requests
 import json
 import urllib3
 import time
+import ipaddress
 
 from urllib3.exceptions import InsecureRequestWarning  # for insecure https warnings
 from requests.auth import HTTPBasicAuth  # for Basic Auth
@@ -67,19 +68,119 @@ def get_dnac_jwt_token(dnac_auth):
     return dnac_jwt_token
 
 
-def main(client_mac_address):
+def create_path_trace(src_ip, dest_ip, dnac_jwt_token):
     """
-    This sample script will retrieve from Cisco DNA Center client details information for the client with the
-    MAC address {client_mac_address}, at the time the script is executed.
-    :param client_mac_address: the client MAC address
-    :return: None
+    This function will create a new Path Trace between the source IP address {src_ip} and the
+    destination IP address {dest_ip}
+    :param src_ip: Source IP address
+    :param dest_ip: Destination IP address
+    :param dnac_jwt_token: DNA C token
+    :return: DNA C path visualisation id
+    """
+
+    param = {
+        'destIP': dest_ip,
+        'periodicRefresh': False,
+        'sourceIP': src_ip
+    }
+
+    url = DNAC_URL + '/dna/intent/api/v1/flow-analysis'
+    header = {'accept': 'application/json', 'content-type': 'application/json', 'x-auth-token': dnac_jwt_token}
+    path_response = requests.post(url, data=json.dumps(param), headers=header, verify=False)
+    path_json = path_response.json()
+    path_id = path_json['response']['flowAnalysisId']
+    return path_id
+
+
+def get_path_trace_info(path_id, dnac_jwt_token):
+    """
+    This function will return the path trace details for the path visualisation {id}
+    :param path_id: DNA C path visualisation id
+    :param dnac_jwt_token: DNA C token
+    :return: Path visualisation status, and the details in a list [device,interface_out,interface_in,device...]
+    """
+
+    url = DNAC_URL + '/dna/intent/api/v1/flow-analysis/' + path_id
+    header = {'accept': 'application/json', 'content-type': 'application/json', 'x-auth-token': dnac_jwt_token}
+    path_response = requests.get(url, headers=header, verify=False)
+    path_json = path_response.json()
+    path_info = path_json['response']
+    path_status = path_info['request']['status']
+    path_list = []
+    if path_status == 'COMPLETED':
+        network_info = path_info['networkElementsInfo']
+        path_list.append(path_info['request']['sourceIP'])
+        for elem in network_info:
+            try:
+                path_list.append(elem['ingressInterface']['physicalInterface']['name'])
+            except:
+                pass
+            try:
+                path_list.append(elem['name'])
+            except:
+                pass
+            try:
+                path_list.append(elem['egressInterface']['physicalInterface']['name'])
+            except:
+                pass
+        path_list.append(path_info['request']['destIP'])
+    return path_status, path_list
+
+
+def validate_ipv4_address(ipv4_address):
+    """
+    This function will validate if the provided string is a valid IPv4 address
+    :param ipv4_address: string with the IPv4 address
+    :return: true/false
+    """
+    try:
+        ipaddress.ip_address(ipv4_address)
+        return True
+    except:
+        return False
+
+
+def main():
+    """
+    This sample script will:
+    - ask the user to enter the source and destination node IPv4 address and optional the source and destination port,
+    optional protocol
+    - start the Cisco DNA Center Path Trace for the above endpoints
+    - retrieve the Path Trace result
     """
 
     # obtain the Cisco DNA C Auth Token
     dnac_token = get_dnac_jwt_token(DNAC_AUTH)
 
+    # ask user for the inout of the IPv4 addresses and ports, protocol
+    # validate if the entered IPv4 addresses are valid
+
+    while True:
+        source_ip = input('Input the source IPv4 Address:   ')
+        if validate_ipv4_address(source_ip) is True:
+            break
+        else:
+            print('IPv4 address is not valid')
+
+    source_port = input('Input the source port (or Enter for none):   ')
+
+    while True:
+        destination_ip = input('Input the destination IPv4 Address:   ')
+        if validate_ipv4_address(destination_ip) is True:
+            break
+        else:
+            print('IPv4 address is not valid')
+
+    destination_port = input('Input the destination port (or Enter for none):   ')
+
+    protocol = input('Input the protocol (or Enter for none):   ')
+
+
+
 
     print('\n\nEnd of Application "path_trace.py" Run')
 
+
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1]))
+    main()
+
