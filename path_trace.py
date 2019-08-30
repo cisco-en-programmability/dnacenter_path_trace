@@ -27,7 +27,7 @@ __version__ = "0.1.0"
 __copyright__ = "Copyright (c) 2019 Cisco and/or its affiliates."
 __license__ = "Cisco Sample Code License, Version 1.1"
 
-import sys
+
 import requests
 import json
 import urllib3
@@ -52,6 +52,7 @@ def pprint(json_data):
     """
     print(json.dumps(json_data, indent=4, separators=(' , ', ' : ')))
 
+
 def get_dnac_jwt_token(dnac_auth):
     """
     Create the authorization token required to access DNA C
@@ -59,7 +60,6 @@ def get_dnac_jwt_token(dnac_auth):
     :param dnac_auth - DNA C Basic Auth string
     :return Cisco DNA C Auth Token
     """
-
     url = DNAC_URL + '/dna/system/api/v1/auth/token'
     header = {'content-type': 'application/json'}
     response = requests.post(url, auth=dnac_auth, headers=header, verify=False)
