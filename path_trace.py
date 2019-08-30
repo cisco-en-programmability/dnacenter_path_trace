@@ -68,12 +68,15 @@ def get_dnac_jwt_token(dnac_auth):
     return dnac_jwt_token
 
 
-def create_path_trace(src_ip, dest_ip, dnac_jwt_token):
+def create_path_trace(src_ip, src_port, dest_ip, dest_port, protocol, dnac_jwt_token):
     """
     This function will create a new Path Trace between the source IP address {src_ip} and the
     destination IP address {dest_ip}
     :param src_ip: Source IP address
+    :param src_port: Source port, range (1-65535) or 'None'
     :param dest_ip: Destination IP address
+    :param dest_port: Destination port, range (1-65535) or 'None'
+    :param protocol: IP Protocol, range (1-254) or 'None'
     :param dnac_jwt_token: DNA C token
     :return: DNA C path visualisation id
     """
@@ -83,7 +86,16 @@ def create_path_trace(src_ip, dest_ip, dnac_jwt_token):
         'periodicRefresh': False,
         'sourceIP': src_ip
     }
+    if src_port is not '':
+        param.update({'sourcePort': src_port})
+    if dest_port is not '':
+        param.update({'destPort': dest_port})
+    if protocol is not '':
+        param.update({'protocol': protocol})
 
+    # print the path trace details
+    print('\nInitiated Path Trace with these parameters:')
+    pprint(param)
     url = DNAC_URL + '/dna/intent/api/v1/flow-analysis'
     header = {'accept': 'application/json', 'content-type': 'application/json', 'x-auth-token': dnac_jwt_token}
     path_response = requests.post(url, data=json.dumps(param), headers=header, verify=False)
@@ -99,13 +111,20 @@ def get_path_trace_info(path_id, dnac_jwt_token):
     :param dnac_jwt_token: DNA C token
     :return: Path visualisation status, and the details in a list [device,interface_out,interface_in,device...]
     """
+    # check every 10 seconds to see if path trace completed
+    path_status = 'INPROGRESS'
+    while path_status == 'INPROGRESS':
 
-    url = DNAC_URL + '/dna/intent/api/v1/flow-analysis/' + path_id
-    header = {'accept': 'application/json', 'content-type': 'application/json', 'x-auth-token': dnac_jwt_token}
-    path_response = requests.get(url, headers=header, verify=False)
-    path_json = path_response.json()
-    path_info = path_json['response']
-    path_status = path_info['request']['status']
+        # wait 10 seconds for the path trace to be completed
+        time.sleep(10)
+
+        url = DNAC_URL + '/dna/intent/api/v1/flow-analysis/' + path_id
+        header = {'accept': 'application/json', 'content-type': 'application/json', 'x-auth-token': dnac_jwt_token}
+        path_response = requests.get(url, headers=header, verify=False)
+        path_json = path_response.json()
+        path_info = path_json['response']
+        path_status = path_info['request']['status']
+
     path_list = []
     if path_status == 'COMPLETED':
         network_info = path_info['networkElementsInfo']
@@ -124,7 +143,13 @@ def get_path_trace_info(path_id, dnac_jwt_token):
             except:
                 pass
         path_list.append(path_info['request']['destIP'])
-    return path_status, path_list
+        return path_status, path_list
+    else:
+        if path_status == 'FAILED':
+            path_error = [path_info['request']['failureReason']]
+            return path_status, path_error
+        else:
+            return 'Something went wrong', ''
 
 
 def validate_ipv4_address(ipv4_address):
@@ -155,6 +180,7 @@ def main():
     # ask user for the inout of the IPv4 addresses and ports, protocol
     # validate if the entered IPv4 addresses are valid
 
+    # enter and validate source ip address
     while True:
         source_ip = input('Input the source IPv4 Address:   ')
         if validate_ipv4_address(source_ip) is True:
@@ -162,8 +188,23 @@ def main():
         else:
             print('IPv4 address is not valid')
 
-    source_port = input('Input the source port (or Enter for none):   ')
+    # enter and validate the source port
+    while True:
+        value = input('Input the source port number (or Enter for none):   ')
+        if value is '':
+            source_port = value
+            break
+        else:
+            try:
+                source_port = int(value)
+                if 1 <= source_port <= 65535:
+                    break
+                else:
+                    print('Invalid port number entered')
+            except:
+                print('Invalid port number entered')
 
+    # enter and validate the destination ip address
     while True:
         destination_ip = input('Input the destination IPv4 Address:   ')
         if validate_ipv4_address(destination_ip) is True:
@@ -171,12 +212,48 @@ def main():
         else:
             print('IPv4 address is not valid')
 
-    destination_port = input('Input the destination port (or Enter for none):   ')
+    # enter and validate the source port
+    while True:
+        value = input('Input the destination port number (or Enter for none):   ')
+        if value is '':
+            destination_port = value
+            break
+        else:
+            try:
+                destination_port = int(value)
+                if 1 <= destination_port <= 65535:
+                    break
+                else:
+                    print('Invalid port number entered')
+            except:
+                print('Invalid protocol number entered')
 
-    protocol = input('Input the protocol (or Enter for none):   ')
+    # enter and validate the protocol number
+    while True:
+        value = input('Input the protocol number (or Enter for none):   ')
+        if value is '':
+            protocol = value
+            break
+        else:
+            try:
+                protocol = int(value)
+                if 1 <= protocol <= 254:
+                    break
+                else:
+                    print('Invalid protocol number entered')
+            except:
+                print('Invalid protocol number entered')
 
+    # create path trace
+    path_trace_id = create_path_trace(source_ip, source_port, destination_ip, destination_port, protocol, dnac_token)
 
+    # print the path trace id
+    print('\nInitiated Path Trace with the id: \n', path_trace_id)
 
+    path_trace_result = get_path_trace_info(path_trace_id, dnac_token)
+    print('\nPath Trace status: ', path_trace_result[0])
+    print('\nPath Trace result:')
+    pprint(path_trace_result[1])
 
     print('\n\nEnd of Application "path_trace.py" Run')
 
