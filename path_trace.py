@@ -177,7 +177,7 @@ def main():
     # obtain the Cisco DNA C Auth Token
     dnac_token = get_dnac_jwt_token(DNAC_AUTH)
 
-    # ask user for the inout of the IPv4 addresses and ports, protocol
+    # ask user for the input of the IPv4 addresses and ports, protocol
     # validate if the entered IPv4 addresses are valid
 
     # enter and validate source ip address
