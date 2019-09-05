@@ -55,10 +55,10 @@ def pprint(json_data):
 
 def get_dnac_jwt_token(dnac_auth):
     """
-    Create the authorization token required to access DNA C
-    Call to Cisco DNA C - /api/system/v1/auth/login
-    :param dnac_auth - DNA C Basic Auth string
-    :return Cisco DNA C Auth Token
+    Create the authorization token required to access Cisco DNA Center
+    Call to Cisco DNA Center- /api/system/v1/auth/login
+    :param dnac_auth - Cisco DNA Center Basic Auth string
+    :return Cisco DNA Center Auth Token
     """
     url = DNAC_URL + '/dna/system/api/v1/auth/token'
     header = {'content-type': 'application/json'}
@@ -77,8 +77,8 @@ def create_path_trace(src_ip, src_port, dest_ip, dest_port, protocol, dnac_jwt_t
     :param dest_ip: Destination IP address
     :param dest_port: Destination port, range (1-65535) or 'None'
     :param protocol: IP Protocol, range (1-254) or 'None'
-    :param dnac_jwt_token: DNA C token
-    :return: DNA C path visualisation id
+    :param dnac_jwt_token: Cisco DNA Center token
+    :return: Cisco DNA Center path visualisation id
     """
 
     param = {
@@ -107,8 +107,8 @@ def create_path_trace(src_ip, src_port, dest_ip, dest_port, protocol, dnac_jwt_t
 def get_path_trace_info(path_id, dnac_jwt_token):
     """
     This function will return the path trace details for the path visualisation {id}
-    :param path_id: DNA C path visualisation id
-    :param dnac_jwt_token: DNA C token
+    :param path_id: Cisco DNA Center path visualisation id
+    :param dnac_jwt_token: Cisco DNA Center token
     :return: Path visualisation status, and the details in a list [device,interface_out,interface_in,device...]
     """
     # check every 10 seconds to see if path trace completed
@@ -174,10 +174,10 @@ def main():
     - retrieve the Path Trace result
     """
 
-    # obtain the Cisco DNA C Auth Token
+    # obtain the Cisco DNA Center Auth Token
     dnac_token = get_dnac_jwt_token(DNAC_AUTH)
 
-    # ask user for the input of the IPv4 addresses and ports, protocol
+    # ask user for the inout of the IPv4 addresses and ports, protocol
     # validate if the entered IPv4 addresses are valid
 
     # enter and validate source ip address
