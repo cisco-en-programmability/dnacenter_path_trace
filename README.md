@@ -6,7 +6,8 @@ This Python script will perform Path Trace between two clients in the Cisco DNA 
 Path Trace is a excellent tool to assist in troubleshooting connectivity between a source device and destination device.
 
 Path Trace will collect the path information for specified source and destination IPv4 addresses, and optional, source and destination port numbers, and protocol number.
-It will collect also information about in-path interface statistics, device statistics, ACLs and QoS Policies
+
+It will collect also information about in-path statistics for interfaces, interface configured ACLs and QoS policies, and device statistics
 
 **Cisco Products & Services:**
 
