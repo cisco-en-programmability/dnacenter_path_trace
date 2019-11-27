@@ -258,7 +258,7 @@ def main():
     path_trace_id = create_path_trace(source_ip, source_port, destination_ip, destination_port, protocol, dnac_token)
 
     # print the path trace id
-    print('\nInitiated Path Trace with the id: \n', path_trace_id)
+    print('\nInitiated Path Trace with the id: \n' + path_trace_id)
 
     path_trace_result = get_path_trace_info(path_trace_id, dnac_token)
     print('\nPath Trace status: ', path_trace_result[0])
