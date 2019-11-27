@@ -19,19 +19,14 @@ It will collect also information about in-path interface statistics, device stat
 **Usage**
 
 This app will ask the user to input the following:
-Source IPv4 Address
-Source port number (or Enter for none)
-Destination IPv4 Address
-Destination port number (or Enter for none)
-Protocol number (or Enter for none)
 
-- $ python path_trace.py 
+- Source IPv4 Address
+- Source port number (or Enter for none)
+- Destination IPv4 Address
+- Destination port number (or Enter for none)
+- Protocol number (or Enter for none)
 
-This script will use the Cisco DNA Center APIs to find out the path taken in the network between the specified source and destination clients.
-
-- mandatory parameters: source_ip and destination_ip
-
-- optional parameters: source_port, destination_port, protocol
+$ python path_trace.py 
 
 *Sample output:*
 
