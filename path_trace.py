@@ -71,7 +71,8 @@ def get_dnac_jwt_token(dnac_auth):
 def create_path_trace(src_ip, src_port, dest_ip, dest_port, protocol, dnac_jwt_token):
     """
     This function will create a new Path Trace between the source IP address {src_ip} and the
-    destination IP address {dest_ip}
+    destination IP address {dest_ip}.
+    The
     :param src_ip: Source IP address
     :param src_port: Source port, range (1-65535) or 'None'
     :param dest_ip: Destination IP address
@@ -83,8 +84,14 @@ def create_path_trace(src_ip, src_port, dest_ip, dest_port, protocol, dnac_jwt_t
 
     param = {
         'destIP': dest_ip,
+        'sourceIP': src_ip,
         'periodicRefresh': False,
-        'sourceIP': src_ip
+        'inclusions': [
+            'INTERFACE-STATS',
+            'DEVICE-STATS',
+            'ACL-TRACE',
+            'QOS-STATS'
+        ]
     }
     if src_port is not '':
         param.update({'sourcePort': src_port})
@@ -127,6 +134,9 @@ def get_path_trace_info(path_id, dnac_jwt_token):
 
     path_list = []
     if path_status == 'COMPLETED':
+        # print the complete Path Trace output
+        print('\n\nThe complete path trace info is: \n')
+        pprint(path_info)
         network_info = path_info['networkElementsInfo']
         path_list.append(path_info['request']['sourceIP'])
         for elem in network_info:
