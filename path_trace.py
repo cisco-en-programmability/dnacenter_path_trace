@@ -115,8 +115,8 @@ def get_path_trace_info(path_id, dnac_jwt_token):
     path_status = 'INPROGRESS'
     while path_status == 'INPROGRESS':
 
-        # wait 10 seconds for the path trace to be completed
-        time.sleep(10)
+        # wait 2 seconds for the path trace to be completed
+        time.sleep(2)
 
         url = DNAC_URL + '/dna/intent/api/v1/flow-analysis/' + path_id
         header = {'accept': 'application/json', 'content-type': 'application/json', 'x-auth-token': dnac_jwt_token}
