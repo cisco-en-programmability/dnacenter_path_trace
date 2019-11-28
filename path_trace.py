@@ -188,7 +188,7 @@ def main():
     # obtain the Cisco DNA Center Auth Token
     dnac_token = get_dnac_jwt_token(DNAC_AUTH)
 
-    # ask user for the inout of the IPv4 addresses and ports, protocol
+    # ask user for the input of the IPv4 addresses and ports, protocol
     # validate if the entered IPv4 addresses are valid
 
     # enter and validate source ip address
@@ -223,7 +223,7 @@ def main():
         else:
             print('IPv4 address is not valid')
 
-    # enter and validate the source port
+    # enter and validate the destination port
     while True:
         value = input('Input the destination port number (or Enter for none):   ')
         if value is '':
