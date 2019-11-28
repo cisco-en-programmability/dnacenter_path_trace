@@ -180,6 +180,7 @@ def main():
     This sample script will:
     - ask the user to enter the source and destination node IPv4 address and optional the source and destination port,
     optional protocol
+    - validate if the entered IPv4 addresses, ports and protocol numbers are valid
     - start the Cisco DNA Center Path Trace for the above endpoints
     - retrieve the Path Trace result
     """

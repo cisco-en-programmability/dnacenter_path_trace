@@ -27,6 +27,9 @@ This app will ask the user to input the following:
 - Destination port number (or Enter for none)
 - Protocol number (or Enter for none)
 
+It will validate if the provided IPv4 addresses, ports and protocol numbers are valid.
+It will initiate a new flow analysis, verify when the task is completed, retrieve the Path Trace details, parse the output and provide the hop-by-hop info.
+
 $ python path_trace.py 
 
 *Sample output:*
